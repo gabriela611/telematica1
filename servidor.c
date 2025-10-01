@@ -115,8 +115,14 @@ void *client_handler(void *arg) {
                 send(cli->sockfd, "SPEED LIMIT REACHED. COMMAND NOT EXECUTED\n", strlen("SPEED LIMIT REACHED. COMMAND NOT EXECUTED\n"), 0);
             }
         } else if (strncmp(buffer, "SLOW DOWN", 9) == 0) {
-            velocidad -= 10;
-            send(cli->sockfd, "ACK SLOW DOWN\n", strlen("ACK SLOW DOWN\n"), 0);
+            if (velocidad > 0){
+                velocidad -= 10;
+                send(cli->sockfd, "ACK SLOW DOWN\n", strlen("ACK SPEED UP\n"), 0);
+            }
+            if (velocidad <= 0){
+                velocidad = 0; 
+                send(cli->sockfd, "MINIMUM SPEED REACHED. CANNOT SLOW DOWN\n", strlen("MINIMUM SPEED REACHED. CANNOT SLOW DOWN\n"), 0);
+            }
         } else if (strncmp(buffer, "TURN LEFT", 9) == 0) {
             girar(1);
             send(cli->sockfd, "ACK TURN LEFT\n", strlen("ACK TURN LEFT\n"), 0);
@@ -146,6 +152,13 @@ void *client_handler(void *arg) {
     }
 
     close(cli->sockfd);
+
+    char msg[128];
+    snprintf(msg, sizeof(msg), "CLIENT DISCONNECTED (%s:%d)",
+            inet_ntoa(cli->addr.sin_addr),
+            ntohs(cli->addr.sin_port));
+    log_message(msg, &cli->addr);
+
     pthread_mutex_lock(&clients_mutex);
     for(int i=0; i<MAX_CLIENTS; i++) {
         if(clients[i] == cli) {
@@ -157,6 +170,7 @@ void *client_handler(void *arg) {
 
     free(cli);
     pthread_exit(NULL);
+
 }
 
 int main(int argc, char *argv[]) {

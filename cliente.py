@@ -15,10 +15,11 @@ def recibir_datos(sock):
         try:
             data = sock.recv(1024).decode()
             if not data:
+                print("\n[INFO] El servidor se ha cerrado. La conexión fue terminada.")
                 break
             print("\n[Servidor]:", data.strip())
         except:
-            print("Conexión cerrada por el servidor")
+            print("\n[ERROR] Conexión perdida: el servidor dejó de responder.")
             break
 
 def main():
@@ -26,7 +27,12 @@ def main():
 
     # Crear socket TCP
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.connect((HOST, PORT))
+    try:
+        sock.connect((HOST, PORT))
+    except Exception as e:
+        print(f"[ERROR] No se pudo conectar al servidor: {e}")
+        return
+
     print(f"Conectado al servidor en {HOST}:{PORT}")
 
     # Autenticación
@@ -49,14 +55,15 @@ def main():
         while True:
             cmd = input("ENTER COMMAND: ").strip().upper()
             if cmd == "EXIT":
-                print("")
+                print("[INFO] Cerrando conexión con el servidor por decisión del cliente...")
                 sock.close()
                 break
-            elif cmd in ["SPEED UP", "SLOW DOWN", "TURN LEFT", "TURN RIGHT"]:
-                sock.sendall((cmd + "\n").encode())
-            elif cmd == "LIST USERS":
-                sock.sendall((cmd + "\n").encode())
-
+            elif cmd in ["SPEED UP", "SLOW DOWN", "TURN LEFT", "TURN RIGHT", "LIST USERS"]:
+                try:
+                    sock.sendall((cmd + "\n").encode())
+                except:
+                    print("[ERROR] No se pudo enviar el comando: conexión cerrada.")
+                    break
             else:
                 print("Comando no válido.")
     else:
