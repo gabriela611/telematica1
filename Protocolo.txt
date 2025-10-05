@@ -1,0 +1,99 @@
+RFC: Telemetry & Control Protocol (TCP-based)
+Version: 1.0
+Authors: Maria Acevedo - Gabriela Sanabria - Tomas Londoño
+Date: 2025-10-03
+
+1. Vision general del protocolo
+-------------------------------
+El protocolo define comunicación simple basada en líneas de texto sobre TCP. Hay dos roles principales: ADMIN (control) y OBSERVER (solo telemetría). 
+El servidor genera periódicamente mensajes de telemetría (TLM). El ADMIN puede enviar comandos (CMD) para controlar el vehículo. 
+El servidor implementa autenticación por contraseña y emite un token persistente cuando un ADMIN valida por contraseña.
+
+2. Primitivas y semantica
+-------------------------
+- LOGIN ADMIN <password>
+  Solicita autenticación como administrador. Si la contraseña es correcta, el servidor responde con:
+    OK Admin logged in
+  y a continuación envía:
+    ADMIN_TOKEN <hex-token>
+  El token debe almacenarse por el cliente y puede usarse después para reconexiones.
+
+- LOGIN ADMINTOKEN <token>
+  Intenta iniciar sesión como ADMIN utilizando un token previamente emitido por el servidor.
+  Respuestas posibles:
+    OK Admin logged in (by token)
+    ERROR Invalid admin token
+- LOGIN OBSERVER <name>
+  Se registra como observador (no puede ejecutar comandos). Respuesta: OK Observer logged in
+- TLM <k=v;...;k=v>
+  Mensaje de telemetría enviado por el servidor a todos los clientes. Campos (ejemplo):
+    TLM speed=50;battery=98;temp=31;dir=FORWARD;ts=1696320000
+  Campos:
+    speed: velocidad en km/h (entero)
+    battery: porcentaje de batería [0-100]
+    temp: temperatura en °C (entero)
+    dir: dirección (FORWARD, LEFT, RIGHT, BACKWARD o abreviaturas)
+    ts: timestamp unix (segundos)
+
+- CMD <SUBCMD>  (solo ADMIN)
+  Comandos disponibles:
+    CMD SPEED UP         Incrementa la velocidad en +10 (sujeto a límites y batería)
+    CMD SLOW DOWN
+    CMD TURN LEFT
+    CMD TURN RIGHT
+  Respuestas:
+    OK CMD EXECUTED
+    ERROR BATTERY LOW
+    ERROR MAX SPEED
+    ERROR MIN SPEED
+    ERROR Unknown command
+- QUIT
+  Cierre de sesión por parte del cliente.
+
+3. Formato de mensajes y ejemplos
+--------------------------------
+- Ejemplo de telemetria (servidor -> clientes):
+  TLM speed=60;battery=77;temp=34;dir=RIGHT;ts=1696323600
+- Ejemplo de login admin (cliente -> servidor):
+  LOGIN ADMIN admin123
+- Ejemplo de login por token (cliente -> servidor):
+  LOGIN ADMINTOKEN 1a2b3c4d5e6f
+- Ejemplo de comando (cliente admin -> servidor):
+  CMD SPEED UP
+- Respuesta OK:
+  OK CMD EXECUTED
+4. Reglas de procedimiento (máquina de estados)
+------------------------------------------------
+Estado del cliente:
+  DISCONNECTED -> (connect) -> CONNECTED_NOAUTH
+  CONNECTED_NOAUTH -> (LOGIN ADMIN|LOGIN ADMINTOKEN|LOGIN OBSERVER) -> AUTHENTICATED_ADMIN o AUTHENTICATED_OBSERVER o DISCONNECTED (on error)
+
+En AUTHENTICATED_ADMIN: el cliente puede enviar CMD y recibirá TLM periódicos.
+En AUTHENTICATED_OBSERVER: el cliente solo recibe TLM.
+
+Reglas principales:
+- El servidor acepta solo una de las primitivas de LOGIN al inicio de la conexión. Si no hay una LOGIN válida, cierra la conexión.
+- Cuando un ADMIN se autentica con contraseña, el servidor emite un token; el cliente debe guardarlo y usar LOGIN ADMINTOKEN para futuras conexiones.
+
+5. Ejemplo 
+--------------------------------------------------------
+1) Admin conecta y envía:
+   LOGIN ADMIN admin123\n
+2) Servidor responde:
+   OK Admin logged in\n
+   ADMIN_TOKEN ab12cd34ef56\n
+3) Observer conecta y envía:
+   LOGIN OBSERVER viewer01\n
+4) Servidor responde:
+   OK Observer logged in\n
+5) Servidor periódicamente envía TLM:
+   TLM speed=50;battery=95;temp=30;dir=FORWARD;ts=1696320000\n
+6) Admin envía comando:
+   CMD SPEED UP\n
+7) Servidor ejecuta y responde:
+   OK CMD EXECUTED\n
+8) Telemetría refleja nuevo valor de speed en el siguiente TLM.
+
+---
+
+Parte de este texto fue corregido y generado por IA (En su mayoria gramatica y orden)

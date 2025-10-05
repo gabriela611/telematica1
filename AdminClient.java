@@ -44,9 +44,9 @@ public class AdminClient extends JFrame {
     createTopPanel();
     createMainPanel();
 
-    // Ajusta automáticamente al tamaño mínimo necesario
+    // ajuste automatico de pestaña (se veia feo)
     pack();
-    setMinimumSize(getSize()); // evita que el usuario achique más de lo debido
+    setMinimumSize(getSize()); // evita que el usuario achique mas de lo recomendado
 }
 
 
@@ -84,7 +84,7 @@ public class AdminClient extends JFrame {
         JPanel main = new JPanel(new GridLayout(1, 2, 15, 0));
         main.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        // panel telemetry
+        //panel de data
         JPanel telemetry = new JPanel();
         telemetry.setLayout(new BoxLayout(telemetry, BoxLayout.Y_AXIS));
         telemetry.setBorder(BorderFactory.createTitledBorder("Vehicle Telemetry"));
@@ -95,7 +95,7 @@ public class AdminClient extends JFrame {
         timePanel.add(timeLabel, BorderLayout.EAST);
         telemetry.add(timePanel);
 
-        // dirección como 3 botones indicadores
+        // botones de direccion
         JPanel dirIndicators = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 5));
         dirIndicators.setBorder(BorderFactory.createTitledBorder("Direction Indicator"));
 
@@ -140,7 +140,7 @@ public class AdminClient extends JFrame {
         controls.setBorder(BorderFactory.createTitledBorder("Controls"));
         controls.setBackground(new Color(245, 248, 255));
 
-        // Speed control
+        // speed control
         JPanel speedBox = new JPanel();
         speedBox.setLayout(new BoxLayout(speedBox, BoxLayout.Y_AXIS));
         speedBox.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -173,7 +173,7 @@ public class AdminClient extends JFrame {
         controls.add(speedBox);
         controls.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // Direction control
+        // Direccion control
         JPanel dirBox = new JPanel();
         dirBox.setLayout(new BoxLayout(dirBox, BoxLayout.Y_AXIS));
         dirBox.setBorder(new EmptyBorder(10, 10, 10, 10));

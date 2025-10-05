@@ -1,5 +1,3 @@
-# Client_fixed.py
-# Observador GUI (customtkinter) - versión corregida con botones F, L, R
 
 import customtkinter as ctk
 from datetime import datetime
@@ -18,9 +16,9 @@ class ObserverInterface(ctk.CTk):
         self.receive_thread = None
         self.should_receive = False
 
-        # telemetry data (normalized keys: speed, battery, temperature, direction, time)
+        # telemetry data 
         self.telemetry_data = {
-            "direction": "F",  # default Forward
+            "direction": "F",  
             "speed": "0.0",
             "battery": "0.0",
             "temperature": "0.0",
@@ -31,14 +29,11 @@ class ObserverInterface(ctk.CTk):
         self.title("Vehicle Telemetry Observer")
         self.geometry("950x600")
 
-        # set theme
         ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("blue")
 
-        # layout
         self.create_layout()
 
-        # handle close
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
     def connect(self):
@@ -51,13 +46,13 @@ class ObserverInterface(ctk.CTk):
             self.server_socket.connect((self.host, self.port))
             self.server_socket.settimeout(None)
 
-            # update state
+            # update estado
             self.is_connected = True
             self.status_label.configure(text="● Conectado", text_color="green")
             self.connect_btn.configure(state="disabled")
             self.disconnect_btn.configure(state="normal")
 
-            # start receive loop
+            # loop para recibir 
             self.start_receive_thread()
 
         except Exception as e:
@@ -121,7 +116,6 @@ class ObserverInterface(ctk.CTk):
                         kvs = [x for x in telemetry_str.split(";") if '=' in x]
                         telemetry = dict([x.split("=", 1) for x in kvs])
 
-                        # Normalize to english keys used by the UI
                         self.telemetry_data["speed"] = telemetry.get("speed", "0.0")
                         self.telemetry_data["battery"] = telemetry.get("battery", "0.0")
                         ts = telemetry.get("ts")
@@ -150,7 +144,7 @@ class ObserverInterface(ctk.CTk):
         self.destroy()
 
     def create_layout(self):
-        # top bar
+        #arriba
         top_bar = ctk.CTkFrame(self, height=60)
         top_bar.pack(fill="x")
 
@@ -159,8 +153,7 @@ class ObserverInterface(ctk.CTk):
 
         self.status_label = ctk.CTkLabel(top_bar, text="● Desconectado", font=ctk.CTkFont(size=16), text_color="red")
         self.status_label.pack(side="right", padx=20, pady=10)
-
-        # main split
+        #centro
         main_frame = ctk.CTkFrame(self)
         main_frame.pack(fill="both", expand=True, padx=20, pady=20)
 
@@ -170,7 +163,7 @@ class ObserverInterface(ctk.CTk):
         right_panel = ctk.CTkFrame(main_frame)
         right_panel.pack(side="right", fill="both", expand=True, padx=10)
 
-        # telemetry numbers
+
         self.time_label = self.add_info_row(left_panel, "Time", "00:00:00")
         self.speed_label = self.add_info_row(left_panel, "Speed", "0.0 km/h")
         self.battery_label = self.add_info_row(left_panel, "Battery", "0%")
@@ -180,7 +173,7 @@ class ObserverInterface(ctk.CTk):
         self.battery_bar.pack(fill="x", padx=20, pady=10)
         self.battery_bar.set(1.0)
 
-        # direction buttons
+        # botones de direccion
         ctk.CTkLabel(right_panel, text="Direction", font=ctk.CTkFont(size=18, weight="bold")).pack(pady=10)
         dir_frame = ctk.CTkFrame(right_panel, fg_color="transparent")
         dir_frame.pack(expand=True, pady=20)
@@ -199,7 +192,7 @@ class ObserverInterface(ctk.CTk):
         self.forward_btn.pack(side="left", padx=20, pady=10)
         self.right_btn.pack(side="left", padx=20, pady=10)
 
-        # connect buttons
+        # botones de conexion
         connection_frame = ctk.CTkFrame(self)
         connection_frame.pack(fill="x", padx=15, pady=10)
 
@@ -222,7 +215,7 @@ class ObserverInterface(ctk.CTk):
         return lbl
 
     def update_telemetry_display(self):
-        # update labels from normalized keys
+
         self.time_label.configure(text=self.telemetry_data.get("time", "00:00:00"))
         direction = self.telemetry_data.get("direction", "F").upper()
 
@@ -238,7 +231,7 @@ class ObserverInterface(ctk.CTk):
         elif direction in ["R", "RIGHT"]:
             self.right_btn.configure(fg_color="orange")
 
-        # speed
+        
         self.speed_label.configure(text=f"{self.telemetry_data.get('speed', '0.0')} km/h")
 
         try:
