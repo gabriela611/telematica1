@@ -1,5 +1,7 @@
 Vehicle Project - Usage Instructions
 
+If you have any strugle with the compilation contact us
+
  Compilation
 We use a Makefile to simplify the compilation and execution process.
 Make sure you are running in a Linux environment (Ubuntu or Kali recommended).
