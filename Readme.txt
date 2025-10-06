@@ -1,21 +1,21 @@
-# VEHICLE PROJECT - USAGE INSTRUCTIONS
+VEHICLE PROJECT - USAGE INSTRUCTIONS
 
 
 If you have any trouble with the compilation, contact us.
 ---
 
-## COMPILATION
+COMPILATION
 
 
 We use a Makefile to simplify the compilation and execution process.  
 Make sure you are running in a Linux environment (Ubuntu or Kali recommended).
 
-# !!! IMPORTANT !!!
+!!! IMPORTANT !!!
 Windows is NOT supported for the C server because of socket library differences.
 
 
 
-## COMMANDS
+COMMANDS
 
 
 
@@ -86,7 +86,7 @@ This will:
 
 
 
-## TIPS
+TIPS
 
  - Run all commands from the main project folder (where the Makefile is located)
  - Use Ctrl + C in the terminal to stop the Admin or Observer interfaces
