@@ -1,86 +1,96 @@
-# 🚗 Vehicle Project - Usage Instructions
+# VEHICLE PROJECT - USAGE INSTRUCTIONS
 
-If you encounter any compilation issues, please contact us.
 
+If you have any trouble with the compilation, contact us.
 ---
 
-## 🛠️ Compilation
+## COMPILATION
 
-We use a **Makefile** to simplify compilation and execution.  
-Ensure you're running in a **Linux environment** (Ubuntu or Kali recommended).
 
-> ⚠️ **Important:** Windows is **not supported** for the C server due to socket library differences.
+We use a Makefile to simplify the compilation and execution process.  
+Make sure you are running in a Linux environment (Ubuntu or Kali recommended).
 
+# !!! IMPORTANT !!!
+Windows is NOT supported for the C server because of socket library differences.
+
+
+
+## COMMANDS
+
+
+
+>>> COMPILE EVERYTHING <<<
 ---
-
-## 📋 Commands
-
-### ▶️ Compile Everything
-```bash
-make all
+Command:
+    make all
 
 This will:
+ - Compile the C server (server)
+ - Compile the Java Admin client
+ - Prepare the Python Observer interface
 
-Compile the C server (server)
 
-Compile the Java Admin client
-
-Prepare the Python Observer interface
-
-🚀 Run All Components
-```bash
-make run-all
+>>> RUN ALL COMPONENTS <<<
+---
+Command:
+    make run-all
 
 This command will:
-
-Start the server in the background (it keeps running)
-
-Open the Admin interface (Java)
-
-Launch the Observer interface (Python)
+ - Start the server in background (it keeps running)
+ - Open the Admin interface (Java)
+ - Launch the Observer interface (Python)
 
 You will see the vehicle’s telemetry and controls working together.
 
-🛑 Stop the Server
-```bash
-make stop-server
+
+>>> STOP THE SERVER <<<
+---
+Command:
+    make stop-server
 
 Important:
-The server runs in the background, so you must stop it manually before running it again.
-Otherwise, you’ll get a “port already in use” error.
+The server runs in the background, so you must stop it manually
+with this command before running again.
 
-If the issue persists, kill the process manually:
+Otherwise, you will get a “port already in use” error.
 
-```bash
-ps aux | grep server
-kill -9 XXX   # Replace XXX with the process number
+If you continue with the issue, kill the process manually:
+  1. ps aux | grep server
+  2. kill -9 XXX   (replace XXX with the process number)
 
-🧹 Clean Everything
-```bash
-make clean
+
+>>> CLEAN EVERYTHING <<<
+---
+Command:
+    make clean
 
 This removes:
-Compiled files (server, .class)
-Log file (logs.txt)
-PID file (used for the running server)
-Python virtual environment (.venv)
+ - Compiled files (server, .class)
+ - Log file (logs.txt)
+ - PID file (used for the running server)
+ - Python virtual environment (.venv)
 
 Use this if you want to rebuild everything from scratch.
 
-💡 Additional Command
-If it’s your first time running the project or you’ve cloned it on a new computer, run:
 
-```bash
-make check
+>>> ADDITIONAL COMMAND <<<
+---
+If it’s your first time running the project or you cloned it on a new computer, run:
+    make check
 
 This will:
+ - Check if gcc, Java, and Python3 are installed
+ - Verify that python3-venv is available
+ - Create a virtual environment (.venv) if missing
+ - Install customtkinter automatically for the Python GUI
 
-Check if gcc, Java, and Python3 are installed
-Verify that python3-venv is available
-Create a virtual environment (.venv) if missing
-Install customtkinter automatically for the Python GUI
 
-🧠 Tips
-Run all commands from the main project folder (where the Makefile is located)
-Use Ctrl + C in the terminal to stop the Admin or Observer interfaces
-If make check shows missing packages, follow the suggested install commands
+
+## TIPS
+
+ - Run all commands from the main project folder (where the Makefile is located)
+ - Use Ctrl + C in the terminal to stop the Admin or Observer interfaces
+ - If “make check” shows missing packages, follow the suggested install commands
+
+
+                 ## END OF README FILE
