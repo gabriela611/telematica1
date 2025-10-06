@@ -1,38 +1,38 @@
-import javax.swing.*;
+import javax.swing.*; // interface
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.io.*;
+import java.io.*;//sockets 
 import java.net.*;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
+import java.util.HashMap; //vlave=valor
 
 public class AdminClient extends JFrame {
     // networking
-    private Socket socket;
+    private Socket socket; //conexion
     private BufferedReader in;
-    private BufferedWriter out;
-    private volatile boolean receiving = false;
-    private Thread recvThread;
+    private BufferedWriter out; 
+    private volatile boolean receiving = false;//client listening
+    private Thread recvThread; //thread to listen server
 
     // ui
-    private JTextField hostField;
+    private JTextField hostField; //buttoms and fields
     private JTextField portField;
     private JButton connectBtn, disconnectBtn;
     private JLabel statusLabel;
 
     // telemetry
-    private JLabel timeLabel, speedLabel, batteryLabel, tempLabel;
+    private JLabel timeLabel, speedLabel, batteryLabel, tempLabel; //show real time info
     private JProgressBar batteryBar;
 
-    // direction indicators (reemplazo de brújula)
+    // direction indicators
     private JButton forwardIndicator, leftIndicator, rightIndicator;
 
     // commands
     private JButton speedUpBtn, slowDownBtn, turnLeftBtn, turnRightBtn;
 
-    // authentication
+    // authentication, we just hardcode for simplicity
     private final String adminPass = "admin123";
 
     public AdminClient() {
@@ -41,7 +41,7 @@ public class AdminClient extends JFrame {
     setLocationRelativeTo(null);
     setLayout(new BorderLayout());
 
-    createTopPanel();
+    createTopPanel();//create principal panel and top panel call
     createMainPanel();
 
     // ajuste automatico de pestaña (se veia feo)
@@ -51,7 +51,7 @@ public class AdminClient extends JFrame {
 
 
     private void createTopPanel() {
-        JPanel top = new JPanel(new GridLayout(2, 4, 10, 5));
+        JPanel top = new JPanel(new GridLayout(2, 4, 10, 5));//define grid
         top.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         top.add(new JLabel("Server Host:"));
@@ -84,9 +84,9 @@ public class AdminClient extends JFrame {
         JPanel main = new JPanel(new GridLayout(1, 2, 15, 0));
         main.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        //panel de data
+        //panel of data(left)
         JPanel telemetry = new JPanel();
-        telemetry.setLayout(new BoxLayout(telemetry, BoxLayout.Y_AXIS));
+        telemetry.setLayout(new BoxLayout(telemetry, BoxLayout.Y_AXIS));//organiza vertical
         telemetry.setBorder(BorderFactory.createTitledBorder("Vehicle Telemetry"));
 
         JPanel timePanel = createTelemetryBox("Time:", "");
@@ -118,7 +118,7 @@ public class AdminClient extends JFrame {
         telemetry.add(batteryPanel);
 
         batteryBar = new JProgressBar(0, 100);
-        batteryBar.setValue(100);
+        batteryBar.setValue(100);//modificate color of the bar depending on the value
         batteryBar.setForeground(new Color(46, 204, 113));
         batteryBar.setPreferredSize(new Dimension(200, 20));
         batteryBar.setStringPainted(true);
@@ -147,7 +147,7 @@ public class AdminClient extends JFrame {
         speedBox.setBackground(new Color(245, 248, 255));
 
         JLabel speedTitle = new JLabel("Speed Control", SwingConstants.CENTER);
-        speedTitle.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        speedTitle.setFont(new Font("Segoe UI", Font.BOLD, 14));//more style
         speedTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
         speedBox.add(speedTitle);
         speedBox.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -155,7 +155,7 @@ public class AdminClient extends JFrame {
         speedUpBtn = new JButton("↑ Speed Up");
         styleButton(speedUpBtn, new Color(39, 174, 96));
         speedUpBtn.setPreferredSize(new Dimension(180, 45));
-        speedUpBtn.setMaximumSize(new Dimension(180, 45));
+        speedUpBtn.setMaximumSize(new Dimension(180, 45));//same size
         speedUpBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         speedUpBtn.addActionListener(e -> sendCommand("CMD SPEED UP"));
         speedBox.add(speedUpBtn);
@@ -211,7 +211,7 @@ public class AdminClient extends JFrame {
         add(main, BorderLayout.CENTER);
     }
 
-    private JPanel createTelemetryBox(String label, String initial) {
+    private JPanel createTelemetryBox(String label, String initial) {//create box for telemetry,  like lavel and value
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(new EmptyBorder(5, 10, 5, 10));
         JLabel l = new JLabel(label);
@@ -231,7 +231,7 @@ public class AdminClient extends JFrame {
         btn.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
     }
 
-    private JButton makeDirButton(String text) {
+    private JButton makeDirButton(String text) {//direction buttons
         JButton btn = new JButton(text);
         btn.setPreferredSize(new Dimension(120, 60));
         btn.setEnabled(false); // solo indicador, no clickeable
@@ -240,7 +240,7 @@ public class AdminClient extends JFrame {
         btn.setFont(new Font("Segoe UI", Font.BOLD, 14));
         return btn;
     }
-
+    //change color of the buttons depending on the direction
     private void updateDirectionButtons(String dir) {
         // reset
         forwardIndicator.setBackground(new Color(200, 200, 200));
@@ -260,7 +260,7 @@ public class AdminClient extends JFrame {
     }
 
     // networking
-    private void connect() {
+    private void connect() { //read ip and port, create a socket, send login, start receiving thread
         String host = hostField.getText().trim();
         int port;
         try {
@@ -300,7 +300,7 @@ public class AdminClient extends JFrame {
         }).start();
     }
 
-    private void disconnect() {
+    private void disconnect() {//send quit and update interface
         receiving = false;
         sendCommandSync("QUIT");
         cleanup();
@@ -312,7 +312,7 @@ public class AdminClient extends JFrame {
         });
     }
 
-    private void cleanup() {
+    private void cleanup() {//clear resources
         receiving = false;
         try {
             if (recvThread != null) recvThread.interrupt();
@@ -331,7 +331,7 @@ public class AdminClient extends JFrame {
         socket = null;
     }
 
-    private void startReceiving() {
+    private void startReceiving() {//2nd thread to listen server
         recvThread = new Thread(() -> {
             String line;
             try {
@@ -341,9 +341,9 @@ public class AdminClient extends JFrame {
                     line = line.trim();
                     if (line.isEmpty()) continue;
 
-                    if (line.startsWith("TLM")) {
-                        String payload = line.substring(line.indexOf(' ') + 1);
-                        HashMap<String, String> tel = parseKeyValues(payload, ";", "=");
+                    if (line.startsWith("TLM")) {//if starts with TLM, parse and update telemetry
+                        String payload = line.substring(line.indexOf(' ') + 1); 
+                        HashMap<String, String> tel = parseKeyValues(payload, ";", "=");//divide TLM y datos para update
                         updateTelemetry(tel);
                     } else {
                         System.out.println("SERVER: " + line);
@@ -365,8 +365,8 @@ public class AdminClient extends JFrame {
         return map;
     }
 
-    private void updateTelemetry(HashMap<String, String> tel) {
-        SwingUtilities.invokeLater(() -> {
+    private void updateTelemetry(HashMap<String, String> tel) { //update interface with new data
+        SwingUtilities.invokeLater(() -> {//update interface from the main thread to avoid conflicts(bloking)
             if (tel.containsKey("speed"))
                 speedLabel.setText(tel.get("speed") + " km/h");
             if (tel.containsKey("battery")) {
@@ -397,7 +397,7 @@ public class AdminClient extends JFrame {
         }).start();
     }
 
-    private void sendCommand(String cmd) {
+    private void sendCommand(String cmd) {//send command to server
         if (out == null) return;
         if (!cmd.endsWith("\n")) cmd += "\n";
         sendRaw(cmd);
@@ -412,7 +412,7 @@ public class AdminClient extends JFrame {
         } catch (IOException ignored) {}
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) { //run application
         SwingUtilities.invokeLater(() -> {
             AdminClient app = new AdminClient();
             app.setVisible(true);

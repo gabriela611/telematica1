@@ -31,7 +31,7 @@ pthread_mutex_t clients_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 FILE *logFile;
 
-// Admin persistent token (memoria)
+// Admin persistent token
 char admin_token[129] = "";
 
 // Estado del vehículo
@@ -40,7 +40,7 @@ int battery = 100;
 int temperature = 30;
 char direction[16] = "FORWARD";
 
-// -----Utilidades-----
+// -Utilidades-
 
 // escribir en archivo de logs y en consola
 void write_log(const char *msg) {
