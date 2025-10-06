@@ -21,15 +21,9 @@ PORT=5555
 PIDFILE=server.pid
 VENV=.venv
 
-# =============================
-# COMANDO PRINCIPAL
-# =============================
 
 all: $(SERVER) admin observer
 
-# =============================
-# COMPILACIÓN
-# =============================
 
 $(SERVER): $(SERVER_SRC)
 	$(CC) $(SERVER_SRC) -o $(SERVER) $(CFLAGS)
@@ -40,9 +34,6 @@ admin: $(ADMIN_SRC)
 observer:
 	@echo "Observer listo (usa: make run-observer)"
 
-# =============================
-# EJECUCIÓN
-# =============================
 
 run-server: $(SERVER)
 	@echo "🚀 Iniciando servidor..."
@@ -57,64 +48,58 @@ stop-server:
 	fi
 
 run-admin:
-	@echo "🧩 Iniciando Admin..."
+	@echo " Iniciando Admin..."
 	$(JAVARUN) $(ADMIN_CLASS)
 
 run-observer: $(VENV)/bin/activate
-	@echo "👁 Iniciando Observer..."
+	@echo " Iniciando Observer..."
 	. $(VENV)/bin/activate && $(PYTHON) $(OBSERVER_SRC)
 
 run-all: $(SERVER) admin observer
-	@echo "🚀 Iniciando todos los componentes..."
+	@echo " Iniciando todos los componentes"
 	./$(SERVER) $(PORT) $(LOGFILE) & echo $$! > $(PIDFILE); \
 	$(JAVARUN) $(ADMIN_CLASS) & \
 	. $(VENV)/bin/activate && $(PYTHON) $(OBSERVER_SRC) & \
 	wait
 
-# =============================
+
 # VERIFICACIONES
-# =============================
 
 check:
 	@echo ""
-	@echo "🔍 Verificando entorno de desarrollo..."
+	@echo " Verificando entorno de desarrollo..."
 	@echo "-----------------------------------------"
 
 	@echo "🧱 Comprobando GCC..."; \
 	if ! command -v gcc >/dev/null 2>&1; then \
-		echo "❌ GCC no encontrado. Instálalo con: sudo apt install gcc"; exit 1; \
-	else echo "✅ GCC disponible."; fi
+		echo " GCC no encontrado. Instálalo con: sudo apt install gcc"; exit 1; \
+	else echo " GCC disponible."; fi
 
 	@echo "\n☕ Comprobando Java..."; \
 	if ! command -v javac >/dev/null 2>&1; then \
-		echo "❌ Java no encontrado. Instálalo con: sudo apt install default-jdk"; exit 1; \
-	else echo "✅ Java disponible."; fi
+		echo " Java no encontrado. Instálalo con: sudo apt install default-jdk"; exit 1; \
+	else echo " Java disponible."; fi
 
-	@echo "\n🐍 Comprobando Python3..."; \
+	@echo "\n Comprobando Python3..."; \
 	if ! command -v python3 >/dev/null 2>&1; then \
-		echo "❌ Python3 no encontrado. Instálalo con: sudo apt install python3"; exit 1; \
-	else echo "✅ Python3 disponible."; fi
+		echo " Python3 no encontrado. Instálalo con: sudo apt install python3"; exit 1; \
+	else echo " Python3 disponible."; fi
 
-	@echo "\n📦 Verificando módulo venv..."; \
+	@echo "\n Verificando módulo venv..."; \
 	if ! dpkg -s python3-venv >/dev/null 2>&1; then \
-		echo "⚠️ python3-venv no está instalado. Ejecuta: sudo apt install python3-venv"; exit 1; \
-	else echo "✅ Módulo venv disponible."; fi
+		echo " python3-venv no está instalado. Ejecuta: sudo apt install python3-venv"; exit 1; \
+	else echo " Módulo venv disponible."; fi
 
-	@echo "\n🐍 Creando entorno virtual (si no existe)..."; \
+	@echo "\n Creando entorno virtual (si no existe)..."; \
 	if [ ! -d "$(VENV)" ]; then \
 		python3 -m venv $(VENV) || { echo "❌ Error creando entorno virtual"; exit 1; }; \
 	fi
 
-	@echo "\n📥 Instalando dependencias de Python..."; \
+	@echo "\n Instalando dependencias de Python..."; \
 	. $(VENV)/bin/activate && $(PIP) install --upgrade pip && $(PIP) install customtkinter || { echo "❌ Error instalando dependencias"; exit 1; }
 
-	@echo "\n✅ Entorno de desarrollo verificado correctamente."
-
-# =============================
-# LIMPIEZA
-# =============================
+	@echo "\n Entorno de desarrollo verificado correctamente."
 
 clean:
 	rm -f $(SERVER) $(LOGFILE) *.class $(PIDFILE)
-	rm -rf $(VENV)
-	@echo "🧹 Limpieza completa."
+	@echo "Limpieza completa."
